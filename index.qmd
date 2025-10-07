@@ -4,6 +4,8 @@ author: "Lizeth Chavez"
 subtitle: "Investigation into Chicago taxis"
 echo: false
 bibliography: references.bib
+editor_options: 
+  chunk_output_type: console
 ---
 
 ## Packages
@@ -16,8 +18,63 @@ library(tidymodels)
 library(scales)
 ```
 
+## First visualization
+
+```{r}
+#| label: "glimpsing"
+glimpse(taxi)
+```
+
+The "taxi" data frame contains information about a subset of taxi trips in the city of Chicago in 2022. We have 7 different variables: ( `{r} colnames(taxi)` ) and 10,000 records.
+
 ## Question 1
+
+Is there there a relationship between the distance (in miles) someone travels in a taxi and if they tip or not?
+
+```{r}
+#| label: "distance vs tip"
+taxi |> ggplot(aes(x = distance, y = tip)) +
+  geom_violin() +
+  geom_jitter(alpha = 0.1)
+
+taxi |> filter(distance > 10) |>
+  ggplot(aes(x = distance, y = tip)) +
+  geom_violin() +
+  geom_jitter(alpha = 0.1)
+```
+
+In general, most of the trips were tipped, regardless of the distance. Longer distances (more than 20 miles) are less common, and most of them were tipped, but there were also some that were not.
 
 ## Question 2
 
+Do taxi passengers tend to tip more for the company Chicago Independents than the other companies?
+
+```{r}
+#| label: "Tips per company"
+taxi |> ggplot(aes(y = company, fill = tip)) +
+  geom_bar(position = "fill")
+```
+
+```{r}
+#| label: "Tips Chicago vs others"
+taxi  %>% mutate(company = if_else(
+  company == "Chicago Independents", 
+  "Chicago Independents", 
+  "Others")) |> 
+  ggplot(aes(y = company, fill = tip)) +
+  geom_bar(position = "fill")
+```
+
+In both plots we can see that in the company Chicago Independents a bigger fraction of the trips are tipped than within all of the other companies.
+
 ## Your own question
+
+Is there a month in the year when people tend to tip more?
+
+```{r}
+#| label: "Tips per month"
+taxi |> ggplot(aes(y = month, fill = tip)) +
+  geom_bar(position = "fill")
+```
+
+In the graph, we can not clearly observe more tendency to tip during any month. Perhaps in april the tendency is higher, but the difference is really small.
